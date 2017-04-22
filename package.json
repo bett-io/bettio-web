@@ -1,7 +1,7 @@
 {
-  "name": "helloworld-lambda-web",
+  "name": "tinybet-web",
   "version": "1.0.0",
-  "description": "Helloworld on lambda for a web",
+  "description": "webserver for tinybet.io",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/.setup.js test/**/*-test.js",
