@@ -2,9 +2,6 @@
   "common": {
     "region": "us-west-2"
   },
-  "lambda": {
-    "function_name": "tinybet-web-dev"
-  },
   "cognito": {
     "identity_pool_id": "us-west-2:7d35c32b-f93e-4c38-adf8-95aa66e38524"
   }
