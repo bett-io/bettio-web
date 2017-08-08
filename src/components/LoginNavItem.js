@@ -1,14 +1,18 @@
 import React, { PropTypes } from 'react';
-import { NavItem } from 'react-bootstrap';
+import { NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 
-const Login = ({ isLogin, onClickLogin, onClickLogout }) => {
-  if (isLogin) {
-    return <NavItem href="#" onClick={e => {
-      e.preventDefault();
-      onClickLogout();
-    }}>
-      Logout
-    </NavItem>;
+const Login = ({ isLoggedIn, onClickLogin, onClickLogout }) => {
+  if (isLoggedIn) {
+    return <NavDropdown eventKey={1} title="Menu" id="basic-nav-dropdown">
+      <MenuItem eventKey={1.1}></MenuItem>
+      <MenuItem divider />
+      <MenuItem eventKey={1.2} href="#" onClick={e => {
+        e.preventDefault();
+        onClickLogout();
+      }}>
+        Logout
+      </MenuItem>
+    </NavDropdown>;
   } else {
     return <NavItem href="#" onClick={e => {
       e.preventDefault();
@@ -20,7 +24,7 @@ const Login = ({ isLogin, onClickLogin, onClickLogout }) => {
 };
 
 Login.propTypes = {
-  isLogin: PropTypes.bool.isRequired,
+  isLoggedIn: PropTypes.bool.isRequired,
   onClickLogin: PropTypes.func.isRequired,
   onClickLogout: PropTypes.func.isRequired,
 };
