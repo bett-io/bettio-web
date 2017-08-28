@@ -3,6 +3,6 @@
     "region": "us-west-2"
   },
   "dynamodb": {
-    "session": "arn:aws:dynamodb:us-west-2:960280041249:table/hello_session"
+    "session": "arn:aws:dynamodb:us-west-2:960280041249:table/session"
   }
 }
