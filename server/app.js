@@ -3,41 +3,67 @@
 var express = require('express');
 var path = require('path');
 
+import awsConfig from 'aws.config.json';
+import bodyParser from 'body-parser';
 import React from 'react';
 import { renderToString } from 'react-dom/server';
-import { match, RouterContext } from 'react-router';
-import routes from '../modules/routes';
+import { StaticRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
 import createReduxStore from '../modules/store';
 
-const store = createReduxStore({});
+import auth from './auth';
+import sessionUtil from './sessionUtil';
+
+import App from '../src/containers/App';
 
 const app = express();
 
+app.use(bodyParser.json()); // for parsing POST body
+app.use(sessionUtil.createSessionMiddleware(awsConfig.common.region));
 app.use(express.static(path.join(__dirname, './public')));
 
 app.get('*', (req, res) => {
-  match({ routes: routes, location: req.url }, (err, redirect, props) => {
-    if (err) {
-      res.status(500).send(err.message);
-    } else if (redirect) {
-      res.redirect(redirect.pathname + redirect.search);
-    } else if (props) {
-      const appHtml = renderToString(
-        <Provider store={store}>
-          <RouterContext {...props}/>
-        </Provider>
-      );
-      res.send(renderPage(appHtml));
-    } else {
-      res.status(404).send('Not Found');
-    }
-  });
+  console.log({ function:'app.get', req: { url: req.url } });
+
+  const context = {};
+
+  // counter in session for demo
+  if (!req.session.counter) req.session.counter = 0;
+  req.session.counter++;
+
+  const initialState = sessionUtil.createInitialReduxState(req.session);
+  const store = createReduxStore(initialState);
+
+  const appHtml = renderToString(
+    <Provider store={store}>
+      <StaticRouter
+        location={req.url}
+        context={context}>
+        <App/>
+      </StaticRouter>
+    </Provider>
+  );
+
+  if (context.url) {
+    res.redirect(302, context.url);
+  } else {
+    res.send(renderPage(appHtml, store.getState()));
+  }
 });
 
-const initialState = store.getState();
+app.post('/signin', (req, res) => {
+  console.log({ function:'app.post', req: { url: req.url } });
 
-function renderPage(appHtml) {
+  res.send(auth.signin(req, res));
+});
+
+app.post('/signout', (req, res) => {
+  console.log({ function:'app.post', req: { url: req.url } });
+
+  res.send(auth.signout(req, res));
+});
+
+function renderPage(appHtml, initialState) {
   return `
     <!doctype html public="storage">
     <html>

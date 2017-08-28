@@ -2,7 +2,7 @@
   "common": {
     "region": "us-west-2"
   },
-  "cognito": {
-    "identity_pool_id": "us-west-2:a0ef3062-be32-4999-a744-89337fe4c163"
+  "dynamodb": {
+    "session": "arn:aws:dynamodb:us-west-2:960280041249:table/hello_session"
   }
 }

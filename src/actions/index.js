@@ -1,38 +1,40 @@
-import cognito from './cognito';
 import facebook from './facebook';
+import apiserver from '../libs/apiserver';
 
-export const authUpdated = (auth) => ({
-  type: 'AUTH_UPDATED',
-  auth,
+export const userUpdated = (user) => ({
+  type: 'USER_UPDATED',
+  user,
 });
 
 export const initializeApp = () => {
-  return (dispatch) => {
-    facebook.initialize()
-      .then(facebook.getAccessToken)
-      .then((fbToken) => {
-        cognito.initialize(fbToken).then(() => {
-          dispatch(authUpdated({ isAuth: !!fbToken }));
-        });
-      });
+  return () => {
+    facebook.initialize();
   };
 };
 
 export const login = () => {
   return (dispatch) => {
     facebook.login()
-      .then(cognito.updateFbToken)
-      .then(() => {
-        dispatch(authUpdated({ isAuth: true }));
+      .then(apiserver.signin)
+      .then((response) => {
+        dispatch(userUpdated({
+          uid: response.data.uid,
+          name: response.data.name,
+          fbToken: response.data.fbToken,
+        }));
       });
   };
 };
 
 export const logout = () => {
   return (dispatch) => {
-    facebook.logout()
+    apiserver.signout()
       .then(() => {
-        dispatch(authUpdated({ isAuth: false }));
+        dispatch(userUpdated({
+          uid: 0,
+          name: '',
+          fbToken: 0,
+        }));
       });
   };
 };
